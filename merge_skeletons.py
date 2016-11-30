@@ -31,12 +31,8 @@ class ParentPredicate(Predicate):
         # make a list of everythign that has a weight. For example, [:agent ONT::PERSON] , etc
         self.links = [l for l in links]
 
-        # TODO: weights is used as a dictionary in above line. Can weight be None?
-        if weights is None:
-            self.weights = {}
-        else:
-            # just change the keys to lowercase
-            self.weights = {a.lower(): b for a, b in weights.items()}
+        # just change the keys to lowercase
+        self.weights = {a.lower(): b for a, b in weights.items()}
 
 
     def _score(self, my_links, other_links):
@@ -48,8 +44,7 @@ class ParentPredicate(Predicate):
         for edge, node in my_links:
             scores = []
             if len(other_links) == 0:
-                # TODO: Why continue? can't we break here since other_links won't change for all other iterations
-                continue
+                break
             for index, link in enumerate(other_links):
                 if edge == link[0]:
                     # How far away are the nodes? node_dist returns node distance
@@ -64,7 +59,7 @@ class ParentPredicate(Predicate):
                     best[edge] = []
                 best[edge].append(res)
                 del other_links[index]
-                descriptions.append(desc)  # discard unnecessary descriptions
+                descriptions.append(desc)
         return self.link_collect(best, my_links, other_links), descriptions
 
 
