@@ -80,12 +80,11 @@ class LorePredicate:
                 )
             )
         for a,b,c in avg_weight:
-            print(a, c)
+            print(a, " -> ", c)
         return max(avg_weight, key=lambda x: x[1])[0]
 
     def process_skeletons(self, model, ontology):
         new_skeletons = []
-        print("Sentence is ", self.sentence)
         # print(self.role_dict)
         if not self.parsed:
             print("No parse available")
@@ -108,12 +107,16 @@ class LorePredicate:
             # Remove head word
             surrounding_words.remove(headword)
 
-            new_head = self.get_best_interpretation(headword, surrounding_words, model, ontology)
+
+            print()
+            print("Sentence is ", self.sentence)
             print(headword, " is the head word")
+
+            new_head = self.get_best_interpretation(headword, surrounding_words, model, ontology)
+
             print(new_head," is the new selected head word")
             print(surrounding_words, " are surrounding words")
             new_sk = "({} {})".format(new_head, " ".join(skeleton[1:-1].split()[1:]))
-            print()
             print("Original skeleton : ", skeleton)
             print("New skeleton : ", new_sk)
             print()
