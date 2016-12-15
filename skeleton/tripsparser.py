@@ -22,6 +22,7 @@ def parse(sentence):
         "tag-type": "",
         "senses-only-for-penn-poss": "",
     }
+
     a = requests.get("http://trips.ihmc.us/parser/cgi/parse", params=params)
     root = ET.fromstring(a.text)
     utt = root.find("utt")
