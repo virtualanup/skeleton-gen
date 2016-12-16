@@ -31,9 +31,12 @@ TRIPS_ONTOLOGY = ontology.load_ontology(trips_path)
 print("TRIPS ontology loaded")
 
 word2vec_model = gensim.models.Word2Vec.load_word2vec_format(
-word2vec_path, binary=True)
+    word2vec_path, binary=True)
 print("Word2Vec data loaded")
 
+
+def get_headword(sk_list):
+    return [n[1:-1].split()[0] for n in sk_list]
 
 # Process the skeletons
 count = 0
@@ -61,15 +64,15 @@ for sentence, orig_skeletons in skels_list:
         pass
 
     # Before processing, get the parse by TRIPS parser
-    trips_skeleton = set(predicate.parsed)
+    trips_skeleton = set(get_headword(predicate.parsed))
 
     # process the skeletons
 
     predicate.process_skeletons(word2vec_model, TRIPS_ONTOLOGY)
 
-    generated_skeletons = set(predicate.parsed)
+    generated_skeletons = set(get_headword(predicate.parsed))
 
-    orig_skeletons = set(orig_skeletons)
+    orig_skeletons = set(get_headword(orig_skeletons))
 
     # Compare the original and generated skeletons
     trips_correct = len(orig_skeletons & trips_skeleton)
@@ -79,8 +82,19 @@ for sentence, orig_skeletons in skels_list:
     tsc += skeleton_correct
     total += len(orig_skeletons)
 
-    # if len(generated_skeletons & orig_skeletons) > 0:
-    #     print(generated_skeletons & orig_skeletons)
+    if len(trips_skeleton & orig_skeletons) > 0:
+        print("--------------------------------")
+        print("sentence : ", sentence)
+        print("original skeletons : ", orig_skeletons)
+        print("trips skeleton : ", trips_skeleton)
+        print("Generated skeletons : ", generated_skeletons)
+        print("Common between trips and original : ",
+              trips_skeleton & orig_skeletons)
+        print("Common between generated  and original : ",
+              generated_skeletons & orig_skeletons)
+        print("--------------------------------")
+        print()
+        print()
     # else:
     #     print("No match found")
     #     print(orig_skeletons)
@@ -90,7 +104,7 @@ for sentence, orig_skeletons in skels_list:
     # print()
     # print()
 
-    print(trips_correct," and ", skeleton_correct)
+    print(trips_correct, " and ", skeleton_correct)
 
     count += 1
     if(count > 10):
