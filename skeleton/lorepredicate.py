@@ -21,7 +21,7 @@ class LorePredicate:
         self.role_dict = dict()
 
         # TODO: Add more light verbs
-        self.light_verbs = ["know", "have", "do", "take", "make", "give", "get", "use", "sell", "push"]
+        self.light_verbs = ["know", "are", "be", "have", "do", "take", "make", "give", "get", "use", "sell", "push"]
 
     def str(self):
         return self.sentence
@@ -73,6 +73,13 @@ class LorePredicate:
         # To get the sense from wordnet, use ontology.lookup here
         # possible_interp = ontology.lookup(headword)
         possible_interp = ontology.get_word(headword)
+
+        # Try to add the head role as possible interpretation
+        try:
+            possible_interp += [ontology.data[current_interpretation]]
+        except:
+            raise
+            pass
         weightage = []
         avg_weight = []
 
@@ -92,7 +99,7 @@ class LorePredicate:
         for interp in possible_interp:
             weight_list = []
             for word in interp.words:
-                if word != headword:
+                if word != headword or (headword == word == interp.name):
                     weight = 0
                     for role in surrounding_words:
                         if role in model and word in model:
@@ -104,14 +111,14 @@ class LorePredicate:
             avg_weight.append(
                 (
                     interp.name,
-                    sum(wl[1] for wl in weight_list[:2]) /
+                    sum(wl[1] for wl in weight_list[:4]) /
                     len(weight_list) if len(weight_list) > 0 else 0,
                     ','.join([wl[0] + ": " + str(wl[1]) for wl in weight_list])
                 )
             )
         if verbose:
             for a, b, c in avg_weight:
-                print(a, " -> ", c)
+                print(a,"(", b, ")"," -> ", c)
         if len(avg_weight) > 0:
             return max(avg_weight, key=lambda x: x[1])[0]
         return None
