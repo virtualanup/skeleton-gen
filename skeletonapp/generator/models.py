@@ -82,3 +82,9 @@ class ProcessedSkeleton(models.Model):
             )
         )
     get_edit_url.allow_tags = True
+
+class Skeleton(models.Model):
+    """
+    This represent the final skeletons
+    """
+    skeleton = models.TextField()
