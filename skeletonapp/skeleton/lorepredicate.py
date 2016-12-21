@@ -76,9 +76,14 @@ class LorePredicate:
 
         # Try to add the head role as possible interpretation
         try:
-            possible_interp += [ontology.data[current_interpretation]]
+            # Add the current interpretation if it doesnot exist
+            i = ontology.data[current_interpretation]
+            for p in possible_interp:
+                if p.name == i.name:
+                    break
+            else:
+                possible_interp += i
         except:
-            raise
             pass
         weightage = []
         avg_weight = []
@@ -94,7 +99,7 @@ class LorePredicate:
         else:
             if verbose:
                 print("Not found in possible ontology list")
-            return None
+            return current_interpretation, [current_interpretation]
 
         for interp in possible_interp:
             weight_list = []
@@ -120,11 +125,15 @@ class LorePredicate:
             for a, b, c in avg_weight:
                 print(a,"(", b, ")"," -> ", c)
         if len(avg_weight) > 0:
-            return max(avg_weight, key=lambda x: x[1])[0]
-        return None
+
+            return (max(avg_weight, key=lambda x: x[1])[0],
+            [x[0] for x in sorted(avg_weight, key=lambda x: x[1])])
+
+        return current_interpretation, [current_interpretation]
 
     def process_skeletons(self, model, ontology, verbose=False):
         new_skeletons = []
+        self.misc_info = {}
         # print(self.role_dict)
         if not self.parsed:
             print("No parse available")
@@ -149,8 +158,10 @@ class LorePredicate:
 
             if headword not in self.light_verbs:
                 # print("Not in light verb")
-                new_head = self.get_best_interpretation(
+                new_head, possible_heads = self.get_best_interpretation(
                     headword, headrole, surrounding_words, model, ontology, verbose)
+                if possible_heads:
+                    self.misc_info[skeleton] = {'ph': list(reversed(possible_heads))}
             else:
                 # print("In light verb")
                 new_head = headrole

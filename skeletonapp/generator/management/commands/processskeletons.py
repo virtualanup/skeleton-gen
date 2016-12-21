@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from skeleton import LoreParser
 from diesel import ontology
 from django.conf import settings
+import json
 from django.db.models import Q
 import gensim
 from ...models import SourceSentence, ProcessedSkeleton
@@ -44,16 +45,16 @@ class Command(BaseCommand):
                 if created:
                     # Don't touch manually edited entries
                     skeleton.skeleton = new
+                    print(" Information about it ")
+                    print(predicate.misc_info)
+
+                    if old in predicate.misc_info:
+                        skeleton.possible_entries = json.dumps(predicate.misc_info[old]['ph'])
+                    else:
+                        pass
                     if new != old:
                         print sentence.sentence
                         print old ," -> ", new
                         skeleton.skeleton_type = ProcessedSkeleton.SKELGEN_PROC
 
                 skeleton.save()
-
-
-            # for parse in parses:
-           #     # If new value, process it
-            #     if created:
-            #         pass
-            # print(sentence.sentence)
