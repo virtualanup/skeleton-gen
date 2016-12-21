@@ -4,6 +4,7 @@ from django.db import models
 from skeleton import parse, LoreParser, LorePredicate
 import json
 
+from django.core.urlresolvers import reverse
 
 class SourceSentence(models.Model):
     """
@@ -70,4 +71,14 @@ class ProcessedSkeleton(models.Model):
         (SKELGEN_PROC, 'Processed by SkeletonGen'),
     )
     # How is the current skeleton processed?
-    skeleton_type = models.CharField(max_length=1, choices=TYPE, default=TRIPS_GEN)
+    skeleton_type = models.CharField(
+        max_length=1, choices=TYPE, default=TRIPS_GEN)
+
+    def get_edit_url(self):
+        return '<a href="{}" target="_blank">Edit</a>'.format(
+            reverse(
+                'skeleton_edit',
+                kwargs={"skid": self.pk}
+            )
+        )
+    get_edit_url.allow_tags = True

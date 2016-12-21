@@ -10,4 +10,4 @@ class SentenceAdmin(admin.ModelAdmin):
 @admin.register(ProcessedSkeleton)
 class ProcessedSkeletonAdmin(admin.ModelAdmin):
     search_fields = ['sentence']
-    list_display = ['sentence', 'skeleton', 'possible_entries', 'trips_parse', 'skeleton_type']
+    list_display = ['sentence', 'skeleton', 'possible_entries', 'skeleton_type', 'get_edit_url']

@@ -15,7 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from generator.views import edit_skeleton
 
 urlpatterns = [
+
+    url(
+        r'^edit/(?P<skid>[\d]+)$',
+        edit_skeleton,
+        name='skeleton_edit'
+    ),
     url(r'^admin/', admin.site.urls),
 ]
