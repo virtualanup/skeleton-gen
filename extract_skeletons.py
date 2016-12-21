@@ -43,6 +43,8 @@ if __name__ == "__main__":
         word2vec_model = gensim.models.Word2Vec.load_word2vec_format(
             args.word2vec, binary=True)
         print("Word2vec data loaded")
+    else:
+        print("Word2Vec model not loaded")
 
     sentence_input = (args.input_format == "sentences")
 
@@ -63,9 +65,20 @@ if __name__ == "__main__":
             # Malformed sentence might fail to be parsed
             continue
 
+        print()
+        print()
+        print(line)
+        print('Before word sense disambiguation')
+        predicate.print_skeletons()
+        print()
 
         if(word2vec_model):
             predicate.process_skeletons(word2vec_model, TRIPS_ONTOLOGY)
+            print('After word sense disambiguation')
+            predicate.print_skeletons()
+            print()
+
+
 
         skeletons = predicate.get_skeletons()
         if skeletons:

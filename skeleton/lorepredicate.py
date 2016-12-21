@@ -20,6 +20,9 @@ class LorePredicate:
         self.parsed = None
         self.role_dict = dict()
 
+        # TODO: Add more light verbs
+        self.light_verbs = ["know", "have", "do", "take", "make", "give", "get", "use", "sell", "push"]
+
     def str(self):
         return self.sentence
 
@@ -39,7 +42,7 @@ class LorePredicate:
         """
         if not match:
             self.parsed, self.role_dict = parse(self.sentence)
-            return
+            return self.parsed
 
         pat = self.match()
         if pat is not None:
@@ -53,18 +56,39 @@ class LorePredicate:
                 self.parsed, self.role_dict = parse(sentence1)
             else:
                 self.parsed, self.role_dict = parse(self.sentence)
+        return self.parsed
 
     def get_skeletons(self):
         return self.parsed
 
-    def get_best_interpretation(self, headword, surrounding_words, model, ontology):
+    def print_skeletons(self):
+        for p in self.parsed:
+            print("\t", p)
+
+    def get_best_interpretation(self, headword, current_interpretation, surrounding_words, model, ontology, verbose=False):
         """
         Get the best sense for the word in the context
         """
         # First of all, get all possible interpretations
+        # To get the sense from wordnet, use ontology.lookup here
+        # possible_interp = ontology.lookup(headword)
         possible_interp = ontology.get_word(headword)
         weightage = []
         avg_weight = []
+
+        # If current interpretations is not in the possible ontology,
+        # then believe the trips parser instead of trying to fix the parse
+
+        for i in possible_interp:
+            if i.name.lower().strip() == current_interpretation.lower().strip():
+                if verbose:
+                    print("Found in possible ontology list")
+                break
+        else:
+            if verbose:
+                print("Not found in possible ontology list")
+            return None
+
         for interp in possible_interp:
             weight_list = []
             for word in interp.words:
@@ -85,8 +109,9 @@ class LorePredicate:
                     ','.join([wl[0] + ": " + str(wl[1]) for wl in weight_list])
                 )
             )
-        # for a, b, c in avg_weight:
-        #     print(a, " -> ", c)
+        if verbose:
+            for a, b, c in avg_weight:
+                print(a, " -> ", c)
         if len(avg_weight) > 0:
             return max(avg_weight, key=lambda x: x[1])[0]
         return None
@@ -115,11 +140,16 @@ class LorePredicate:
             # Remove head word
             surrounding_words.remove(headword)
 
-            new_head = self.get_best_interpretation(
-                headword, surrounding_words, model, ontology)
+            if headword not in self.light_verbs:
+                print("Not in light verb")
+                new_head = self.get_best_interpretation(
+                    headword, headrole, surrounding_words, model, ontology, verbose)
+            else:
+                print("In light verb")
+                new_head = headrole
 
             if not new_head:
-                new_head = headword
+                new_head = headrole
 
             new_sk = "({} {})".format(
                 new_head, " ".join(skeleton[1:-1].split()[1:]))
@@ -128,6 +158,7 @@ class LorePredicate:
                 print()
                 print("Sentence is ", self.sentence)
                 print(headword, " is the head word")
+                print(headrole, " is the head role")
                 print(new_head, " is the new selected head word")
                 print(surrounding_words, " are surrounding words")
                 print("Original skeleton : ", skeleton)
