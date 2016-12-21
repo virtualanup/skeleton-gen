@@ -7,11 +7,11 @@ from skeleton import LoreParser
 
 from ...models import SourceSentence
 
+
 class Command(BaseCommand):
     help = 'Parse the sentences using web based trips parser'
 
     def handle(self, *args, **options):
         for sentence in SourceSentence.objects.all():
-            if not sentence.parsed:
-                sentence.parse()
+            sentence.parse()
         print("Sentences parsed")

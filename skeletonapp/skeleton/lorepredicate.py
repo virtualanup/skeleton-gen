@@ -148,11 +148,11 @@ class LorePredicate:
             surrounding_words.remove(headword)
 
             if headword not in self.light_verbs:
-                print("Not in light verb")
+                # print("Not in light verb")
                 new_head = self.get_best_interpretation(
                     headword, headrole, surrounding_words, model, ontology, verbose)
             else:
-                print("In light verb")
+                # print("In light verb")
                 new_head = headrole
 
             if not new_head:
