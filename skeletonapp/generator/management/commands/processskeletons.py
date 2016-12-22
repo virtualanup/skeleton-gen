@@ -33,6 +33,9 @@ class Command(BaseCommand):
         for sentence in SourceSentence.objects.all():
             predicate = sentence.get_predicate()
 
+            if not predicate.parsed:
+                continue
+
             oldparses = predicate.parsed[:]
 
             predicate.process_skeletons(word2vec_model, TRIPS_ONTOLOGY)

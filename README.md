@@ -1,10 +1,16 @@
 # Skeleton
 Sentence skeleton extraction from the Lore knowledge base to improve TRIPS parser.
 
-To load sentences and generate skeletons:
+First of all, install all the requirements
 
-    python extract_skeletons.py -i data/input/money_sentence_subset -o data/output/money_sentence_predicates
+    pip install -r requirements.txt
 
-To merge common skeletons:
+After that, run django migration
 
-    python merge_skeletons.py -i data/output/money_sentence_predicates -o data/output/merged_money_sentence_predicates
+    python manage.py migrate
+
+To load sentences into the database,
+
+    python manage.py loadsentences -i data/input/money_sentence
+
+

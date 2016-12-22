@@ -19,9 +19,13 @@ class ParentPredicate(Predicate):
 
     def node_dist(self, this, other):
         """override this method to use a different node distance"""
-        if this == other or this.is_parent_of(other) or other.is_parent_of(this):
-            return 1
-        return 0
+        try:
+            if this == other or this.is_parent_of(other) or other.is_parent_of(this):
+                return 1
+            return 0
+        except:
+            # print("Error with ", Predicate.name())
+            raise
 
 
     # Original constructor and _score filter out roles if they are not in
@@ -115,7 +119,10 @@ def reduce_skeletons(skeletons, ontology):
                 if len(predicate.links) == 0:
                     continue
                 # Get the score
-                score = predicate.score(s_predicate)
+                try:
+                    score = predicate.score(s_predicate)
+                except:
+                    continue
                 # print(score[0])
                 if score[0] == 1:
                     # print(skeleton, " and ", s_skeleton, " are same")

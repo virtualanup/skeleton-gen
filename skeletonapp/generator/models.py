@@ -75,12 +75,15 @@ class ProcessedSkeleton(models.Model):
         max_length=1, choices=TYPE, default=TRIPS_GEN)
 
     def get_edit_url(self):
-        return '<a href="{}" target="_blank">Edit</a>'.format(
-            reverse(
-                'skeleton_edit',
-                kwargs={"skid": self.pk}
+        if len(self.possible_entries) > 0:
+            return '<a href="{}" target="_blank">Edit</a>'.format(
+                reverse(
+                    'skeleton_edit',
+                    kwargs={"skid": self.pk}
+                )
             )
-        )
+        else:
+            return 'N/A'
     get_edit_url.allow_tags = True
 
 class Skeleton(models.Model):
